@@ -1,0 +1,11 @@
+services:
+  outreach:
+    build: .
+    image: launch-outreach
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./data:/app/data
+      - ./outbox:/app/outbox

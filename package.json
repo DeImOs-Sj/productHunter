@@ -1,0 +1,16 @@
+{
+  "name": "launch-outreach",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Scan Product Hunt / Show HN for products in your niche, find contact emails, draft personalized outreach, send after review.",
+  "scripts": {
+    "scan": "node src/pipeline.js scan",
+    "send": "node src/pipeline.js send",
+    "auto": "node src/pipeline.js auto",
+    "status": "node src/pipeline.js status"
+  },
+  "dependencies": {
+    "nodemailer": "^9.0.3"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules
+data
+outbox
+.env
+.env.example
+scan.log
+*.md
+.gitignore
