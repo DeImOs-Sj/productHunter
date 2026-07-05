@@ -70,7 +70,7 @@ export async function sendDraftPreview(draft) {
   const prospect = draft.prospect;
   const msg = [
     `📧 *New draft: ${prospect.name}*`,
-    `To: \`${draft.to}\``,
+    `To: ${draft.to}`,
     `Score: ${prospect.score}/10 — ${prospect.matchReason || ""}`,
     `Source: ${prospect.source}`,
     `Listing: ${prospect.listing}`,
@@ -83,11 +83,10 @@ export async function sendDraftPreview(draft) {
     `*Footer:*`,
     draft.preview_footer,
   ].join("\n");
-  // Send as plain message — user approves/rejects via chat with the agent
+  // Send as plain text — no Markdown to avoid entity parsing errors
   const result = await api("sendMessage", {
     chat_id: cid,
-    text: msg + `\n\n_Reply to approve or suggest changes._`,
-    parse_mode: "Markdown",
+    text: msg + `\n\nReply to approve or suggest changes.`,
   });
   return result;
 }
@@ -104,8 +103,7 @@ async function handleCallback(query) {
     await api("editMessageText", {
       chat_id: cid,
       message_id: msgId,
-      text: `⚠️ Draft already processed or deleted:\n\`${filePath}\``,
-      parse_mode: "Markdown",
+      text: `⚠️ Draft already processed or deleted:\n${filePath}`,
     });
     return;
   }
@@ -115,8 +113,7 @@ async function handleCallback(query) {
     await api("editMessageText", {
       chat_id: cid,
       message_id: msgId,
-      text: `❌ Rejected — draft deleted:\n\`${filePath}\``,
-      parse_mode: "Markdown",
+      text: `❌ Rejected — draft deleted:\n${filePath}`,
     });
     console.log(`Rejected: ${filePath}`);
     return;
@@ -131,8 +128,7 @@ async function handleCallback(query) {
     await api("editMessageText", {
       chat_id: cid,
       message_id: msgId,
-      text: `✅ *Approved!* Sending now…\n\`${filePath}\``,
-      parse_mode: "Markdown",
+      text: `✅ Approved! Sending now…\n${filePath}`,
     });
 
     // Run send via child process (non-blocking)
@@ -147,12 +143,11 @@ async function handleCallback(query) {
     child.stderr.on("data", (chunk) => { output += chunk.toString(); });
     child.on("close", async (code) => {
       const result = code === 0
-        ? `✅ *Sent successfully!*`
-        : `❌ *Send failed (exit ${code})*`;
+        ? `✅ Sent successfully!`
+        : `❌ Send failed (exit ${code})`;
       await api("sendMessage", {
         chat_id: cid,
-        text: `${result}\n\`\`\`\n${output.slice(0, 1500)}\n\`\`\``,
-        parse_mode: "Markdown",
+        text: `${result}\n${output.slice(0, 1500)}`,
       });
     });
 
@@ -197,8 +192,7 @@ async function handleMessage(msg) {
   // Acknowledge to the user
   await api("sendMessage", {
     chat_id: cid,
-    text: `📨 Got it! Relaying to the agent:\n\n> ${text.slice(0, 200)}`,
-    parse_mode: "Markdown",
+    text: `Got it! Relaying to the agent:\n\n> ${text.slice(0, 200)}`,
   });
 }
 

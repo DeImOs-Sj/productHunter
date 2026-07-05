@@ -2,15 +2,15 @@
   "product": {
     "name": "WebCited",
     "url": "https://webcited.xyz",
-    "description": "WebCited shows where AI answer engines (ChatGPT, Gemini, Perplexity, Claude, Copilot) cite or ignore your website, then generates specific technical fixes (llms.txt, schema markup, comparison pages) to improve your visibility in AI answers — and re-probes the engines to prove the fixes worked. First scan is free, no card required.",
-    "genre": "AI search optimization / SEO / marketing tools for SaaS",
+    "description": "WebCited scans your website against 5 major AI answer engines (ChatGPT, Gemini, Perplexity, Claude, Copilot) and shows exactly where you're cited or ignored. It then generates technical fixes — llms.txt, schema markup, comparison pages — to improve your visibility in AI search, and re-probes the engines to prove the fixes worked. First scan is free, no card required. Any website with a marketing page that wants to be found in AI search is a fit.",
+    "genre": "AI search visibility / AEO (Answer Engine Optimization) — helps any website show up in ChatGPT, Gemini, Perplexity, Claude, Copilot answers",
     "senderName": "Kiyo",
     "senderRole": "Founder"
   },
   "targeting": {
-    "idealProspect": "Founders or growth/marketing leads of newly launched B2B SaaS or web products with a public marketing website, who care about being discovered — traffic, SEO, distribution. They just launched, so being cited by ChatGPT/Perplexity/Google AI Overviews when buyers ask for tools in their category is directly valuable. Bad fits: hardware, mobile-only apps with no real website, open-source libs with no commercial site, products whose site is just a waitlist page.",
-    "keywords": ["saas", "b2b", "marketing", "seo", "growth", "analytics", "ai", "developer tools", "no-code"],
-    "minRelevanceScore": 7,
+    "idealProspect": "Founders or growth/marketing leads of newly launched B2B SaaS or web products with a public marketing website. ANY such product benefits because every new launch wants to be discovered — and buyers increasingly find tools through AI search. Bad fits: hardware, mobile-only apps with no real website, open-source libs with no commercial site, products whose site is just a waitlist page.",
+    "keywords": ["saas", "b2b", "marketing", "seo", "growth", "analytics", "developer tools", "no-code", "productivity", "design", "content", "data", "platform", "api", "tool", "software"],
+    "minRelevanceScore": 5,
     "maxProspectsPerScan": 25
   },
   "email": {
@@ -22,6 +22,10 @@
   },
   "sources": {
     "productHunt": { "enabled": true, "topN": 40 },
-    "showHN": { "enabled": true, "hoursBack": 24 }
+    "showHN": { "enabled": true, "hoursBack": 24 },
+    "crunchbase": { "enabled": true, "maxResults": 25 },
+    "wellfound": { "enabled": false, "maxResults": 25 },
+    "saashub": { "enabled": false, "maxResults": 20 },
+    "betalist": { "enabled": true, "maxResults": 20 }
   }
 }
