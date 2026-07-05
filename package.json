@@ -8,7 +8,10 @@
     "scan": "node src/pipeline.js scan",
     "send": "node src/pipeline.js send",
     "auto": "node src/pipeline.js auto",
-    "status": "node src/pipeline.js status"
+    "status": "node src/pipeline.js status",
+    "review": "node src/pipeline.js review",
+    "relay": "node src/telegram-bot.js poll",
+    "relay-read": "node -e \"const fs=require('fs'),p='telegram-relay.jsonl';if(!fs.existsSync(p)){process.exit(0)}const l=fs.readFileSync(p,'utf8').trim().split('\\\\n').filter(Boolean);if(l.length){console.log(l.join('\\\\n'));fs.writeFileSync(p,'')}\""
   },
   "dependencies": {
     "nodemailer": "^9.0.3"

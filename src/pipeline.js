@@ -25,6 +25,7 @@ import { scoreProspects } from "./analyze/match.js";
 import { findContactEmail } from "./enrich/findEmail.js";
 import { draftEmail } from "./outreach/draft.js";
 import { sendEmail, buildFooter, sleep } from "./outreach/send.js";
+import { sendDraftPreview } from "./telegram-bot.js";
 import {
   loadState, saveState, markSeen, alreadySeen,
   alreadyEmailed, sentToday, logSent,
@@ -186,6 +187,27 @@ function status() {
   console.log(`Outbox pending: ${pending}`);
 }
 
+async function reviewOnTelegram() {
+  if (!fs.existsSync(OUTBOX)) { console.log("No outbox/ — nothing to review."); return; }
+  const files = fs.readdirSync(OUTBOX).filter((f) => f.endsWith(".json") && !f.endsWith(".sent.json"));
+  if (files.length === 0) { console.log("No pending drafts to review."); return; }
+
+  let sent = 0;
+  for (const file of files) {
+    const draft = JSON.parse(fs.readFileSync(path.join(OUTBOX, file), "utf8"));
+    draft.file = path.join(OUTBOX, file);
+    try {
+      await sendDraftPreview(draft);
+      console.log(`  sent to Telegram: ${file} → ${draft.to} (${draft.prospect.name})`);
+      sent++;
+    } catch (err) {
+      console.error(`  FAILED sending ${file} to Telegram: ${err.message}`);
+    }
+  }
+  console.log(`\n${sent} drafts sent to Telegram for review.`);
+  console.log("The Telegram bot (poll mode) will handle approve/reject and sending.");
+}
+
 const cmd = process.argv[2];
 if (cmd === "scan") await scan();
 else if (cmd === "send") await send();
@@ -197,4 +219,9 @@ else if (cmd === "auto") {
   await send();
 }
 else if (cmd === "status") status();
-else console.log("Usage: node src/pipeline.js scan | send | auto | status");
+else if (cmd === "review") {
+  // Scan + send drafts to Telegram for manual approval
+  await scan(false);
+  await reviewOnTelegram();
+}
+else console.log("Usage: node src/pipeline.js scan | send | auto | review | status");
