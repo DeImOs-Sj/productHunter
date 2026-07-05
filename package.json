@@ -14,7 +14,8 @@
     "relay-read": "node -e \"const fs=require('fs'),p='telegram-relay.jsonl';if(!fs.existsSync(p)){process.exit(0)}const l=fs.readFileSync(p,'utf8').trim().split('\\\\\\\\n').filter(Boolean);if(l.length){console.log(l.join('\\\\\\\\n'));fs.writeFileSync(p,'')}\"",
     "daemon": "node src/daemon.js",
     "daemon:crunchbase": "source .venv/bin/activate && PLAYWRIGHT_BROWSERS_PATH=.browsers python3 scrapers/crunchbase.py",
-    "daemon:wellfound": "source .venv/bin/activate && PLAYWRIGHT_BROWSERS_PATH=.browsers python3 scrapers/wellfound.py"
+    "daemon:wellfound": "source .venv/bin/activate && PLAYWRIGHT_BROWSERS_PATH=.browsers python3 scrapers/wellfound_playwright.py",
+    "daemon:saashub": "source .venv/bin/activate && PLAYWRIGHT_BROWSERS_PATH=.browsers python3 scrapers/saashub_playwright.py"
   },
   "dependencies": {
     "nodemailer": "^9.0.3",

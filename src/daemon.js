@@ -83,7 +83,7 @@ const SOURCES = [
     intervalMs: 12 * 3600 * 1000,
     fetchFn: async () => {
       if (!config.sources.saashub?.enabled) return [];
-      return fetchSaaSHub({ maxResults: config.sources.saashub.maxResults || 30 });
+      return runPythonScraper("saashub_playwright.py", config.sources.saashub.maxResults || 20);
     },
   },
   {

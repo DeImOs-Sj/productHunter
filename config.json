@@ -25,7 +25,7 @@
     "showHN": { "enabled": true, "hoursBack": 24 },
     "crunchbase": { "enabled": true, "maxResults": 25 },
     "wellfound": { "enabled": false, "maxResults": 25 },
-    "saashub": { "enabled": false, "maxResults": 20 },
+    "saashub": { "enabled": true, "maxResults": 20 },
     "betalist": { "enabled": true, "maxResults": 20 }
   }
 }

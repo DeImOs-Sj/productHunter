@@ -37,10 +37,21 @@ async def scrape_wellfound(max_results=30):
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             viewport={"width": 1280, "height": 800},
+            storage_state=None,  # Don't persist cookies between runs
         )
         page = await context.new_page()
 
         try:
+            # Load saved cookies to skip login / anti-bot
+            cookies_path = os.path.join(os.path.dirname(__file__), "wellfound_cookies.json")
+            if os.path.exists(cookies_path):
+                with open(cookies_path) as f:
+                    cookies = json.load(f)
+                await context.add_cookies(cookies)
+                print(f"[wellfound] loaded {len(cookies)} cookies", file=sys.stderr)
+            else:
+                print("[wellfound] no cookies file found, trying public access", file=sys.stderr)
+
             print("[wellfound] fetching newest companies...", file=sys.stderr)
             await page.goto(
                 "https://wellfound.com/companies?sort=created_desc",
