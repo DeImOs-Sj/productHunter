@@ -2,7 +2,7 @@
   "product": {
     "name": "WebCited",
     "url": "https://webcited.xyz",
-    "description": "WebCited is a platform that does a complete end-to-end analysis of your website across AI answer engines. We scan your entire site against ChatGPT, Gemini, Perplexity, Claude, and Copilot to show exactly where you're being cited, mentioned, or ignored. Then we generate targeted fixes — llms.txt, schema markup, comparison pages, content gaps — to boost your rankings in AI search, and re-probe to prove the improvements actually worked. First scan is free, no card required. Any website that wants to be found in AI answers is a fit.",
+    "description": "WebCited is a platform that does a complete end-to-end analysis of your website across AI answer engines. We scan your entire site against ChatGPT, Gemini, Perplexity, Claude, and Copilot to build a complete citation map — showing exactly where you're being cited, mentioned, or ignored. Then we surface targeted opportunities to improve your AI visibility and track how those changes perform over time. First scan is free, no card required. Any website that wants to be found in AI answers is a fit.",
     "genre": "AI search visibility / AEO (Answer Engine Optimization) — helps any website show up in ChatGPT, Gemini, Perplexity, Claude, Copilot answers",
     "senderName": "Kiyo",
     "senderRole": "Founder"

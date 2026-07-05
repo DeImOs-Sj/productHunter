@@ -40,7 +40,7 @@ function extractEmails(html) {
   for (const m of html.matchAll(/mailto:([^"'?\s>]+)/gi)) found.add(decodeURIComponent(m[1]));
   for (const m of html.matchAll(EMAIL_RE)) found.add(m[0]);
   return [...found]
-    .map((e) => e.trim().replace(/[.,;:]+$/, "").toLowerCase())
+    .map((e) => e.trim().replace(/[.,;:\\]+$/, "").toLowerCase())
     .filter((e) => EMAIL_RE.test(e) && !JUNK_PATTERNS.some((p) => p.test(e)));
 }
 

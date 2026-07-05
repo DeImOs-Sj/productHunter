@@ -12,6 +12,7 @@ Rules:
 - Congratulate the launch in ONE clause, not a paragraph.
 - Lead with "you/your" over "I/we." Their world first.
 - One or two sentences connecting your product's value to THEIR specific situation. The connection should feel obvious, not stretched.
+- Describe WebCited as a platform that monitors where AI engines cite or mention your website — showing you your citation map across ChatGPT, Gemini, Perplexity, etc. Focus on the analysis and visibility tracking value, not specific technical fixes.
 - One low-pressure ask. Interest-based CTAs ("worth a look?" / "happy to run a free scan") beat meeting requests. Never ask for a call.
 - No: "I hope this finds you well," "My name is X," template language, hype words (leverage, revolutionize, best-in-class, synergy), fake familiarity, flattery padding, emojis.
 - Plain text. 60-120 words. Sign with the sender's name and role only — no signature block, no postal address, no unsubscribe line (footer is added separately).
