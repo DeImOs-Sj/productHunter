@@ -1,17 +1,30 @@
 // Genre/relevance matching via NVIDIA Nemotron.
-// One request scores the whole batch of candidates against your product profile.
+// Scores prospects in small batches to avoid timeouts.
 import { chatJSON } from "../llm.js";
+
+const BATCH_SIZE = 15; // score at most 15 per API call
 
 export async function scoreProspects(config, candidates) {
   if (candidates.length === 0) return [];
 
+  const results = [];
+  for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
+    const batch = candidates.slice(i, i + BATCH_SIZE);
+    const batchResults = await scoreBatch(config, batch);
+    results.push(...batchResults);
+    console.log(`  scored ${Math.min(i + BATCH_SIZE, candidates.length)}/${candidates.length}`);
+  }
+  return results;
+}
+
+async function scoreBatch(config, candidates) {
   const profile = config.product;
   const targeting = config.targeting;
 
   const candidateList = candidates
     .map(
       (c) =>
-        `key: ${c.key}\nname: ${c.name}\ntagline: ${c.tagline}\ndescription: ${c.description.slice(0, 400)}\ntopics: ${c.topics.join(", ")}`
+        `key: ${c.key}\nname: ${c.name}\ntagline: ${c.tagline}\ndescription: ${c.description.slice(0, 300)}\ntopics: ${(c.topics || []).join(", ")}`
     )
     .join("\n---\n");
 
@@ -34,7 +47,7 @@ Score each of these newly launched products for how well their makers fit as pro
 
 ${candidateList}`,
     temperature: 0.2,
-    maxTokens: 16384,
+    maxTokens: 4096,
   });
 
   const byKey = new Map(results.map((r) => [r.key, r]));
