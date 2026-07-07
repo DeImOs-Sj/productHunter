@@ -6,3 +6,8 @@ scan.log
 telegram-relay.jsonl
 .browsers/
 .venv/
+wellfound_cookies.json
+wellfound_input.json
+scrapers/extract_saashub.py
+_test_*.mjs
+scrapers/saashub_scraper.py
