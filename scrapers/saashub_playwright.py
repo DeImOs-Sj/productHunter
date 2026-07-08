@@ -2,7 +2,8 @@
 """
 SaaSHub scraper using Playwright (direct, no crawl4ai).
 
-Extracts recently submitted products from SaaSHub's /new page.
+Extracts recently submitted products from SaaSHub's /new page,
+getting product NAME, DESCRIPTION, and WEBSITE URL.
 
 Usage:
   source .venv/bin/activate && \
@@ -33,12 +34,83 @@ async def scrape_saashub(max_results=30):
         
         print("[saashub] fetching /new...", file=sys.stderr)
         await page.goto("https://www.saashub.com/new", wait_until="networkidle", timeout=30000)
-        await page.wait_for_timeout(5000)
+        await page.wait_for_timeout(3000)
         
-        text = await page.evaluate("() => document.body?.innerText || ''")
+        # Extract structured data from the page using DOM selectors
+        products = await page.evaluate("""(maxResults) => {
+            const results = [];
+            const links = document.querySelectorAll('a[href]');
+            const productLinks = [];
+            
+            for (const a of links) {
+                const href = a.getAttribute('href') || '';
+                const text = a.textContent.trim();
+                if (href.match(/^\\/[a-z0-9][a-z0-9-]+$/) && !href.includes('/new') && !href.includes('/categories') && !href.includes('/tools') && !href.includes('/experts') && !href.includes('/register') && !href.includes('/login') && !href.includes('/about') && !href.includes('/blog') && !href.includes('/submit') && text.length > 1 && text.length < 60 && text !== href) {
+                    productLinks.push({ name: text, url: href });
+                }
+            }
+            
+            const seen = new Set();
+            const unique = productLinks.filter(p => {
+                const key = p.name.toLowerCase();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+            
+            for (const p of unique.slice(0, maxResults)) {
+                let description = '';
+                let website = '';
+                
+                const allLinks = document.querySelectorAll('a[href]');
+                for (const a of allLinks) {
+                    if (a.textContent.trim() === p.name && a.getAttribute('href') === p.url) {
+                        let parent = a.parentElement;
+                        for (let depth = 0; depth < 5; depth++) {
+                            if (!parent) break;
+                            const externalLinks = parent.querySelectorAll('a[href]');
+                            for (const el of externalLinks) {
+                                const eh = el.getAttribute('href') || '';
+                                if (eh.startsWith('http') && !eh.includes('saashub.com')) {
+                                    website = eh;
+                                }
+                            }
+                            const childTexts = [];
+                            for (const child of parent.querySelectorAll('p, div, span')) {
+                                const ct = child.textContent.trim();
+                                if (ct && ct.length > 10 && ct !== p.name && !ct.startsWith('http') && !ct.includes('saashub.com') && !ct.includes('Posted on')) {
+                                    childTexts.push(ct);
+                                }
+                            }
+                            if (childTexts.length > 0) {
+                                description = childTexts.slice(0, 3).join(' | ');
+                            }
+                            if (website) break;
+                            parent = parent.parentElement;
+                        }
+                        break;
+                    }
+                }
+                
+                results.push({
+                    name: p.name,
+                    description: description,
+                    website: website,
+                    listingUrl: 'https://www.saashub.com' + p.url
+                });
+            }
+            
+            return results;
+        }""", max_results)
+        
         await browser.close()
     
-    products = _extract(text, max_results)
+    # If DOM approach found nothing, fall back to regex on full text
+    if not products:
+        text = await page.evaluate("() => document.body?.innerText || ''")
+        await browser.close()
+        
+        products = _extract_fallback(text, max_results)
     
     results = []
     for p in products:
@@ -50,7 +122,7 @@ async def scrape_saashub(max_results=30):
             "tagline": p.get("description", "")[:120],
             "description": p.get("description", ""),
             "votes": 0,
-            "listingUrl": f"https://www.saashub.com/new",
+            "listingUrl": p.get("listingUrl", "https://www.saashub.com/new"),
             "website": p.get("website", ""),
             "topics": [],
         })
@@ -58,75 +130,32 @@ async def scrape_saashub(max_results=30):
     return results
 
 
-def _extract(text, max_results):
-    """Extract products from the 'SaaSHub Submit' section of the page."""
+def _extract_fallback(text, max_results):
+    """Fallback: regex extraction from innerText."""
+    import re
     products = []
+    # Try to find structured patterns: ProductName\nDescription\nPosted on...\nwebsite.com
+    # Pattern: capitalized name followed by description text followed by a URL
     lines = text.split("\n")
-    
-    in_submit = False
     i = 0
     while i < len(lines) and len(products) < max_results:
         line = lines[i].strip()
-        
-        # Find the Submit section
-        if "SaaSHub Submit" in line or line == "Featured":
-            in_submit = True
-            i += 1
-            continue
-        
-        if not in_submit:
-            i += 1
-            continue
-        
-        # Stop at next major sections
-        if line.startswith("Top 15") or "SaaSHub Experts" in line:
-            break
-        
-        # Skip empty/trivial lines
-        if not line or len(line) < 2 or line in ("Feedback", "Register", "Login", "Startups"):
-            i += 1
-            continue
-        if line.startswith("Tools & Categories") or line.startswith("Software Alternatives"):
-            i += 1
-            continue
-        if line.startswith("⭐") or line.startswith("Featured"):
-            i += 1
-            continue
-        
-        # Product names: short, capitalized, NOT starting with "Posted"
-        if (line[0].isupper() or line[0].isdigit()) and len(line) < 50 and not line.startswith("Posted"):
-            lookahead = " ".join(lines[i:i+5])
-            if "Posted on" in lookahead or "posts" in lookahead.lower() or "posts" in line.lower():
-                name = line
-                desc = ""
-                
-                # Walk through following lines for description
-                j = i + 1
-                desc_lines = []
-                while j < len(lines) and j < i + 8:
-                    nl = lines[j].strip()
-                    if not nl:
-                        j += 1
-                        continue
-                    if nl.startswith("Posted on") or nl.startswith("posts") or "posts" in nl.split()[:1]:
-                        j += 1
-                        continue
-                    if nl.startswith("http") or nl.startswith("/"):
-                        j += 1
-                        continue
-                    # Check if this is a new product
-                    if nl[0].isupper() and len(nl) < 50 and nl != name and "Posted" in " ".join(lines[j:j+3]):
-                        break
+        # Look for product name (capitalized, short) followed by website URL nearby
+        if line and (line[0].isupper() or line[0].isdigit()) and len(line) < 60 and not line.startswith("http") and not line.startswith("Posted"):
+            # Look ahead for a website URL
+            website = ""
+            desc_lines = []
+            for j in range(i+1, min(i+10, len(lines))):
+                nl = lines[j].strip()
+                if nl.startswith("http"):
+                    website = nl
+                    break
+                elif nl and not nl.startswith("Posted") and not nl.startswith("posts") and len(nl) > 3:
                     desc_lines.append(nl)
-                    j += 1
-                
+            if website:
                 desc = " ".join(desc_lines)
-                products.append({"name": name, "description": desc})
-                i = j
-                continue
-        
+                products.append({"name": line, "description": desc, "website": website, "listingUrl": ""})
         i += 1
-    
     return products
 
 

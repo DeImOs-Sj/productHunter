@@ -1,25 +1,32 @@
 // Draft a personalized email per prospect via NVIDIA Nemotron.
+// v2 – includes direct link to webcited.xyz + stronger personalization.
 import { chatJSON } from "../llm.js";
+
+const LINK_URL = "https://webcited.xyz";
 
 export async function draftEmail(config, prospect) {
   const p = config.product;
+  const domain = prospect.website ? new URL(prospect.website).hostname.replace(/^www\./, "") : "their-site.com";
+  const utmLink = `${LINK_URL}?ref=${encodeURIComponent(domain)}&utm_source=email&utm_medium=outreach&utm_campaign=prospect-${domain}`;
 
   const draft = await chatJSON({
     system: `You write short, honest cold emails — one founder to another, after noticing their launch.
 
 Rules:
-- Open with something SPECIFIC from their launch listing (tagline, feature, description). Prove a human looked. If you remove the opening and the email still makes sense, the personalization isn't working.
+- Open with something SPECIFIC from their launch (tagline, feature, description, problem they solve). Prove a human looked. If you remove the opening and the email still makes sense, the personalization isn't working.
 - Congratulate the launch in ONE clause, not a paragraph.
 - Lead with "you/your" over "I/we." Their world first.
 - One or two sentences connecting your product's value to THEIR specific situation. The connection should feel obvious, not stretched.
-- Describe WebCited as a platform that monitors where AI engines cite or mention your website — showing you your citation map across ChatGPT, Gemini, Perplexity, etc. Focus on the analysis and visibility tracking value, not specific technical fixes.
+- Describe WebCited as a platform that monitors where AI answer engines (ChatGPT, Gemini, Perplexity, Claude, Copilot) cite or ignore your website — showing a complete citation map of your AI visibility. Focus on the analysis and monitoring value, not specific technical fixes.
+- CRITICAL: Include the scan link naturally in the body. Use the EXACT link: {{SCAN_LINK}}. Phrase it like "see exactly how you show up → {{SCAN_LINK}}" or "I can run a free scan of your site — check your AI visibility here: {{SCAN_LINK}}" — make it feel like a natural handoff, not a banner ad.
 - One low-pressure ask. Interest-based CTAs ("worth a look?" / "happy to run a free scan") beat meeting requests. Never ask for a call.
 - No: "I hope this finds you well," "My name is X," template language, hype words (leverage, revolutionize, best-in-class, synergy), fake familiarity, flattery padding, emojis.
-- Plain text. 60-120 words. Sign with the sender's name and role only — no signature block, no postal address, no unsubscribe line (footer is added separately).
+- Plain text. Sentence case (not all lowercase). 80-150 words. Sign with the sender's name and role only — no signature block, no postal address, no unsubscribe line (footer is added separately).
+- Subject line: specific to their product. 3-6 words. No clickbait, no ALL CAPS, no "quick question." Should make them think "huh, this person actually looked at what I built."
 - Read it aloud before finishing. If it sounds like marketing copy, rewrite it.
 
 Respond with ONLY a JSON object, no prose, exactly this shape:
-{"subject": "<short, specific, 2-4 words, lowercase fine, no punctuation tricks, no clickbait, no ALL CAPS, no 'quick question'>", "body": "<plain-text email body, 60-120 words, no HTML>"}`,
+{"subject": "<3-6 word subject line, specific to their product>", "body": "<plain-text email body, 80-150 words, no HTML, with {{SCAN_LINK}} replaced with the actual link>"}`,
     user: `Sender: ${p.senderName}, ${p.senderRole} of ${p.name} (${p.url})
 Sender's product: ${p.description}
 
@@ -27,14 +34,21 @@ Prospect launch:
 Name: ${prospect.name}
 Tagline: ${prospect.tagline}
 Description: ${prospect.description.slice(0, 500)}
+Domain: ${domain}
 Launched on: ${prospect.source === "producthunt" ? "Product Hunt" : "Hacker News (Show HN)"}
 Why they're relevant: ${prospect.matchReason}
 
-Write the email.`,
+Write the email. Use ${utmLink} as the {{SCAN_LINK}}.`,
     temperature: 0.7,
     maxTokens: 8192,
   });
 
   if (!draft.subject || !draft.body) throw new Error("model returned incomplete draft");
+
+  // Safety fallback: ensure the link is in the body
+  if (!draft.body.includes(LINK_URL)) {
+    draft.body += `\n\nSee how your site appears in AI answers → ${utmLink}`;
+  }
+
   return draft;
 }

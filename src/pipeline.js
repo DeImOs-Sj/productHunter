@@ -21,10 +21,14 @@ if (fs.existsSync(envFile)) {
 }
 import { fetchProductHunt } from "./sources/producthunt.js";
 import { fetchShowHN } from "./sources/showhn.js";
+import { fetchSaaSHub } from "./sources/saashub.js";
+import { fetchBetaList } from "./sources/betalist.js";
 import { scoreProspects } from "./analyze/match.js";
 import { findContactEmail } from "./enrich/findEmail.js";
 import { draftEmail } from "./outreach/draft.js";
 import { sendEmail, buildFooter, sleep } from "./outreach/send.js";
+import { sendFollowUps } from "./outreach/followup.js";
+import { checkReplies } from "./outreach/replyHandler.js";
 import { sendDraftPreview } from "./telegram-bot.js";
 import {
   loadState, saveState, markSeen, alreadySeen,
@@ -71,6 +75,12 @@ async function scan(autoApprove = false) {
   }
   if (config.sources.showHN.enabled) {
     candidates.push(...(await fetchShowHN({ hoursBack: config.sources.showHN.hoursBack })));
+  }
+  if (config.sources.betalist.enabled) {
+    candidates.push(...(await fetchBetaList({ maxResults: config.sources.betalist.maxResults || 20 })));
+  }
+  if (config.sources.saashub.enabled) {
+    candidates.push(...(await fetchSaaSHub({ maxResults: config.sources.saashub.maxResults || 20 })));
   }
   console.log(`Fetched ${candidates.length} launches`);
 
@@ -218,10 +228,20 @@ else if (cmd === "auto") {
   await scan(true);
   await send();
 }
+else if (cmd === "followup") {
+  // Send follow-up emails for non-converting prospects
+  assertConfigured();
+  await sendFollowUps(config);
+}
+else if (cmd === "check-replies") {
+  // Check inbox for replies to sent outreach
+  assertConfigured();
+  await checkReplies(config);
+}
 else if (cmd === "status") status();
 else if (cmd === "review") {
   // Scan + send drafts to Telegram for manual approval
   await scan(false);
   await reviewOnTelegram();
 }
-else console.log("Usage: node src/pipeline.js scan | send | auto | review | status");
+else console.log("Usage: node src/pipeline.js scan | send | auto | followup | check-replies | review | status");

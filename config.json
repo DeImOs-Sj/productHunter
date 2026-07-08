@@ -2,14 +2,31 @@
   "product": {
     "name": "WebCited",
     "url": "https://webcited.xyz",
-    "description": "WebCited is a platform that does a complete end-to-end analysis of your website across AI answer engines. We scan your entire site against ChatGPT, Gemini, Perplexity, Claude, and Copilot to build a complete citation map — showing exactly where you're being cited, mentioned, or ignored. Then we surface targeted opportunities to improve your AI visibility and track how those changes perform over time. First scan is free, no card required. Any website that wants to be found in AI answers is a fit.",
-    "genre": "AI search visibility / AEO (Answer Engine Optimization) — helps any website show up in ChatGPT, Gemini, Perplexity, Claude, Copilot answers",
+    "description": "WebCited is a platform that does a complete end-to-end analysis of your website across AI answer engines. We scan your entire site against ChatGPT, Gemini, Perplexity, Claude, and Copilot to build a complete citation map \u2014 showing exactly where you're being cited, mentioned, or ignored. Then we surface targeted opportunities to improve your AI visibility and track how those changes perform over time. First scan is free, no card required. Any website that wants to be found in AI answers is a fit.",
+    "genre": "AI search visibility / AEO (Answer Engine Optimization) \u2014 helps any website show up in ChatGPT, Gemini, Perplexity, Claude, Copilot answers",
     "senderName": "Kiyo",
     "senderRole": "Founder"
   },
   "targeting": {
-    "idealProspect": "Founders or growth/marketing leads of newly launched B2B SaaS or web products with a public marketing website. ANY such product benefits because every new launch wants to be discovered — and buyers increasingly find tools through AI search. Bad fits: hardware, mobile-only apps with no real website, open-source libs with no commercial site, products whose site is just a waitlist page.",
-    "keywords": ["saas", "b2b", "marketing", "seo", "growth", "analytics", "developer tools", "no-code", "productivity", "design", "content", "data", "platform", "api", "tool", "software"],
+    "idealProspect": "Founders or growth/marketing leads of newly launched B2B SaaS or web products with a public marketing website. ANY such product benefits because every new launch wants to be discovered \u2014 and buyers increasingly find tools through AI search. Bad fits: hardware, mobile-only apps with no real website, open-source libs with no commercial site, products whose site is just a waitlist page.",
+    "keywords": [
+      "saas",
+      "b2b",
+      "marketing",
+      "seo",
+      "growth",
+      "analytics",
+      "developer tools",
+      "no-code",
+      "productivity",
+      "design",
+      "content",
+      "data",
+      "platform",
+      "api",
+      "tool",
+      "software"
+    ],
     "minRelevanceScore": 5,
     "maxProspectsPerScan": 25
   },
@@ -21,11 +38,29 @@
     "postalAddress": "WebCited, Mira Road, Mumbai, MH 401107, India"
   },
   "sources": {
-    "productHunt": { "enabled": true, "topN": 40 },
-    "showHN": { "enabled": true, "hoursBack": 24 },
-    "crunchbase": { "enabled": true, "maxResults": 25 },
-    "wellfound": { "enabled": false, "maxResults": 25 },
-    "saashub": { "enabled": true, "maxResults": 20 },
-    "betalist": { "enabled": true, "maxResults": 20 }
+    "productHunt": {
+      "enabled": true,
+      "topN": 40
+    },
+    "showHN": {
+      "enabled": true,
+      "hoursBack": 24
+    },
+    "crunchbase": {
+      "enabled": true,
+      "maxResults": 25
+    },
+    "wellfound": {
+      "enabled": false,
+      "maxResults": 25
+    },
+    "saashub": {
+      "enabled": true,
+      "maxResults": 20
+    },
+    "betalist": {
+      "enabled": true,
+      "maxResults": 20
+    }
   }
 }
