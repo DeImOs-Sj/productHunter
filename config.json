@@ -34,17 +34,17 @@
     "from": "Kiyo from WebCited <kiyo@webcited.xyz>",
     "replyTo": "kiyo@webcited.xyz",
     "maxPerDay": 15,
-    "delaySecondsBetweenSends": 120,
+    "delaySecondsBetweenSends": 60,
     "postalAddress": "WebCited, Mira Road, Mumbai, MH 401107, India"
   },
   "sources": {
     "productHunt": {
       "enabled": true,
-      "topN": 40
+      "topN": 20
     },
     "showHN": {
       "enabled": true,
-      "hoursBack": 24
+      "hoursBack": 12
     },
     "crunchbase": {
       "enabled": true,

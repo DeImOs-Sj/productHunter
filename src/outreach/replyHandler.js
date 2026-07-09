@@ -17,7 +17,7 @@ const UNSUB_PATTERNS = [
   /unsubscribe/i, /stop/i, /don'?t (email|write|contact)/i,
   /remove/i, /leave me alone/i, /not interested/i,
 ];
-const LINK_URL = "https://webcited.xyz";
+const LINK_URL = "https://surli.cc/doclbs";
 
 function connectIMAP() {
   return new Promise((resolve, reject) => {

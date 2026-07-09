@@ -4,7 +4,7 @@ import { chatJSON } from "../llm.js";
 import { sendEmail, buildFooter, sleep } from "./send.js";
 import { loadState, saveState } from "../state.js";
 
-const LINK_URL = "https://webcited.xyz";
+const LINK_URL = "https://surli.cc/doclbs";
 const DAY_MS = 24 * 3600 * 1000;
 
 export async function sendFollowUps(config) {
@@ -28,16 +28,13 @@ export async function sendFollowUps(config) {
 
     if (!shouldSend) continue;
 
-    const domain = entry.email.split("@")[1] || "their-site.com";
-    const utmLink = `${LINK_URL}?ref=${encodeURIComponent(domain)}&utm_source=email&utm_medium=followup${followUpNum + 1}&utm_campaign=prospect-${domain}`;
-
     const subject = followUpNum === 0
       ? `re: ${entry.product}`
       : `one more thing, ${entry.product}`;
 
     const body = followUpNum === 0
-      ? `Hey — circling back on this. If your launch is picking up steam, now's the time to see whether AI answer engines are citing your site or skipping it entirely.\n\nMost founders tell me they have no idea how they show up in ChatGPT or Gemini until they actually check. The scan takes about 90 seconds and shows your full citation map across ChatGPT, Gemini, Perplexity, Claude, and Copilot.\n\nWorth a look? ${utmLink}\n\n${config.product.senderName}, ${config.product.senderRole}`
-      : `Last note on this — we've scanned over a dozen launch-week sites in the past week, and the results are almost always the same: most are invisible in AI answers on launch day, and the fix takes less than an afternoon.\n\nYour scan is still free — no card, no signup. See where you stand: ${utmLink}\n\nWon't bother you again either way.\n\n${config.product.senderName}, ${config.product.senderRole}`;
+      ? `Hey — circling back on this. If your launch is picking up steam, now's the time to see whether AI answer engines are citing your site or skipping it entirely.\n\nMost founders tell me they have no idea how they show up in ChatGPT or Gemini until they actually check. The scan takes about 90 seconds and shows your full citation map across ChatGPT, Gemini, Perplexity, Claude, and Copilot.\n\nWorth a look? ${LINK_URL}\n\n${config.product.senderName}, ${config.product.senderRole}`
+      : `Last note on this — we've scanned over a dozen launch-week sites in the past week, and the results are almost always the same: most are invisible in AI answers on launch day, and the fix takes less than an afternoon.\n\nYour scan is still free — no card, no signup. See where you stand: ${LINK_URL}\n\nWon't bother you again either way.\n\n${config.product.senderName}, ${config.product.senderRole}`;
 
     try {
       await sendEmail(config, { to: entry.email, subject, body });

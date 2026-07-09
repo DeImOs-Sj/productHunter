@@ -8,6 +8,12 @@ const JUNK_PATTERNS = [
   /@(example|sentry|wixpress|sentry-next|godaddy|domain)\./i,
   /^(noreply|no-reply|donotreply)@/i,
   /@\d+x\./, // image srcset artifacts like image@2x.png
+  /@.*\.sentry\.io$/i,           // Sentry webhook emails
+  /@.*(ingest|sparkpost|sendgrid|mailgun|postmark)\./i, // transactional/webhook senders
+  /^[0-9a-f]{32}@/i,              // MD5 hash as local-part (webhooks)
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}@/i, // UUID local-part
+  /@email\.com$/i,                // placeholder domain
+  /@(your|my|test|demo|sample|placeholder|example)\./i, // placeholder domains
 ];
 
 const PREFERRED_PREFIXES = ["hello", "hi", "hey", "contact", "founders", "team", "support", "info"];
