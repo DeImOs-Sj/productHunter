@@ -23,10 +23,9 @@ import { fetchProductHunt } from "./sources/producthunt.js";
 import { fetchShowHN } from "./sources/showhn.js";
 import { fetchSaaSHub } from "./sources/saashub.js";
 import { fetchBetaList } from "./sources/betalist.js";
-import { scoreProspects } from "./analyze/match.js";
 import { findContactEmail } from "./enrich/findEmail.js";
 import { draftEmail } from "./outreach/draft.js";
-import { sendEmail, buildFooter, sleep } from "./outreach/send.js";
+import { buildFooter, sleep } from "./outreach/send.js";
 import { sendDraftPreview } from "./telegram-bot.js";
 import {
   loadState, saveState, markSeen, alreadySeen,
@@ -161,7 +160,7 @@ async function runPythonScraper(script, maxResults) {
   });
 }
 
-// ── Pipeline: score → enrich → draft → Telegram ───────────────
+// ── Pipeline: enrich → draft → Telegram ───────────────
 async function processProspects(prospects, sourceName) {
   if (prospects.length === 0) return;
 
@@ -177,26 +176,16 @@ async function processProspects(prospects, sourceName) {
   fresh.forEach((p) => markSeen(state, p.key));
   console.log(`  [${sourceName}] ${fresh.length} new prospects`);
 
-  // Score for relevance
-  const scored = await scoreProspects(config, fresh);
-  const matches = scored
-    .filter((p) => p.score >= config.targeting.minRelevanceScore)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, config.targeting.maxProspectsPerScan);
-
-  if (matches.length === 0) {
-    console.log(`  [${sourceName}] 0 relevant prospects (all below ${config.targeting.minRelevanceScore}/10)`);
-    saveState(state);
-    return;
-  }
-  console.log(`  [${sourceName}] ${matches.length} relevant prospects`);
+  // Skip scoring — send to ALL fresh launches (broad outreach mode)
+  const matches = fresh;
+  console.log(`  [${sourceName}] all ${fresh.length} prospects passed through (no scoring)`);
 
   // Enrich + draft
   fs.mkdirSync(OUTBOX, { recursive: true });
   let drafted = 0;
 
   for (const prospect of matches) {
-    process.stdout.write(`  → ${prospect.name} (${prospect.score}/10) ... `);
+    process.stdout.write(`  → ${prospect.name} ... `);
 
     const { email } = await findContactEmail(prospect.website);
     if (!email) { console.log("no email"); continue; }
@@ -209,7 +198,7 @@ async function processProspects(prospects, sourceName) {
       file,
       JSON.stringify(
         {
-          approved: false,
+          approved: true,
           to: email,
           subject: draft.subject,
           body: draft.body,
@@ -220,8 +209,6 @@ async function processProspects(prospects, sourceName) {
             domain: new URL(prospect.website).hostname,
             listing: prospect.listingUrl,
             source: prospect.source,
-            score: prospect.score,
-            matchReason: prospect.matchReason,
           },
         },
         null,

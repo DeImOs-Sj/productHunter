@@ -36,7 +36,6 @@ Tagline: ${prospect.tagline}
 Description: ${prospect.description.slice(0, 500)}
 Domain: ${domain}
 Launched on: ${prospect.source === "producthunt" ? "Product Hunt" : "Hacker News (Show HN)"}
-Why they're relevant: ${prospect.matchReason}
 
 Write the email. Use ${SHORT_LINK} as the scan link.`,
     temperature: 0.7,

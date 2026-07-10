@@ -2,7 +2,7 @@
 // Scores prospects in small batches to avoid timeouts.
 import { chatJSON } from "../llm.js";
 
-const BATCH_SIZE = 15; // score at most 15 per API call
+const BATCH_SIZE = 10; // score at most 10 per API call (15 caused persistent JSON errors from the LLM)
 
 export async function scoreProspects(config, candidates) {
   if (candidates.length === 0) return [];

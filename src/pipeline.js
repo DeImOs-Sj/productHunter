@@ -23,7 +23,6 @@ import { fetchProductHunt } from "./sources/producthunt.js";
 import { fetchShowHN } from "./sources/showhn.js";
 import { fetchSaaSHub } from "./sources/saashub.js";
 import { fetchBetaList } from "./sources/betalist.js";
-import { scoreProspects } from "./analyze/match.js";
 import { findContactEmail } from "./enrich/findEmail.js";
 import { draftEmail } from "./outreach/draft.js";
 import { sendEmail, buildFooter, sleep } from "./outreach/send.js";
@@ -90,19 +89,15 @@ async function scan(autoApprove = false) {
   console.log(`${fresh.length} new since last scan`);
   if (fresh.length === 0) { saveState(state); return; }
 
-  // 3. Genre / relevance matching (one Claude call for the batch)
-  const scored = await scoreProspects(config, fresh);
-  const matches = scored
-    .filter((c) => c.score >= config.targeting.minRelevanceScore)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, config.targeting.maxProspectsPerScan);
-  console.log(`${matches.length} match genre (score >= ${config.targeting.minRelevanceScore})`);
+  // 3. Skip scoring — send to ALL fresh launches (broad outreach to every PH + HN product)
+  const matches = fresh;
+  console.log(`${matches.length} prospects — all passed through (broad outreach mode, no scoring)`);
 
   // 4. Find contact email + 5. draft
   fs.mkdirSync(OUTBOX, { recursive: true });
   let drafted = 0;
   for (const prospect of matches) {
-    process.stdout.write(`  ${prospect.name} (${prospect.score}/10) ... `);
+    process.stdout.write(`  ${prospect.name} ... `);
 
     const { email, website, domain } = await findContactEmail(prospect.website);
     if (!email) { console.log("no email found, skipped"); continue; }
@@ -115,7 +110,7 @@ async function scan(autoApprove = false) {
       file,
       JSON.stringify(
         {
-          approved: autoApprove,
+          approved: true,
           to: email,
           subject: draft.subject,
           body: draft.body,
@@ -126,8 +121,6 @@ async function scan(autoApprove = false) {
             domain,
             listing: prospect.listingUrl,
             source: prospect.source,
-            score: prospect.score,
-            matchReason: prospect.matchReason,
           },
         },
         null,

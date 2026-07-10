@@ -8,27 +8,9 @@
     "senderRole": "Founder"
   },
   "targeting": {
-    "idealProspect": "Founders or growth/marketing leads of newly launched B2B SaaS or web products with a public marketing website. ANY such product benefits because every new launch wants to be discovered \u2014 and buyers increasingly find tools through AI search. Bad fits: hardware, mobile-only apps with no real website, open-source libs with no commercial site, products whose site is just a waitlist page.",
-    "keywords": [
-      "saas",
-      "b2b",
-      "marketing",
-      "seo",
-      "growth",
-      "analytics",
-      "developer tools",
-      "no-code",
-      "productivity",
-      "design",
-      "content",
-      "data",
-      "platform",
-      "api",
-      "tool",
-      "software"
-    ],
-    "minRelevanceScore": 5,
-    "maxProspectsPerScan": 25
+    "idealProspect": "Anyone and everyone launching a product — every new launch wants visibility and buyers discover tools through AI search engines. Every product with a website is a fit.",
+    "minRelevanceScore": 0,
+    "maxProspectsPerScan": 999
   },
   "email": {
     "from": "Kiyo from WebCited <kiyo@webcited.xyz>",
@@ -47,7 +29,7 @@
       "hoursBack": 12
     },
     "crunchbase": {
-      "enabled": true,
+      "enabled": false,
       "maxResults": 25
     },
     "wellfound": {
@@ -55,11 +37,11 @@
       "maxResults": 25
     },
     "saashub": {
-      "enabled": true,
+      "enabled": false,
       "maxResults": 20
     },
     "betalist": {
-      "enabled": true,
+      "enabled": false,
       "maxResults": 20
     }
   }
